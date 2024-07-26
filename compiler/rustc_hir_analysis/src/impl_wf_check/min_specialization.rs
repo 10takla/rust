@@ -104,7 +104,7 @@ fn parent_specialization_node(tcx: TyCtxt<'_>, impl1_def_id: LocalDefId) -> Opti
         // Implementing a normal trait isn't a specialization.
         return None;
     }
-    if trait_def.is_marker {
+    if trait_def.marker.is_some() {
         // Overlapping marker implementations are not really specializations.
         return None;
     }

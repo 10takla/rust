@@ -42,9 +42,9 @@ use rustc_data_structures::steal::Steal;
 use rustc_data_structures::tagged_ptr::CopyTaggedPtr;
 use rustc_data_structures::unord::UnordMap;
 use rustc_errors::{Diag, ErrorGuaranteed, StashKey};
-use rustc_hir as hir;
 use rustc_hir::def::{CtorKind, CtorOf, DefKind, DocLinkResMap, LifetimeRes, Res};
 use rustc_hir::def_id::{CrateNum, DefId, DefIdMap, LocalDefId, LocalDefIdMap};
+use rustc_hir::{self as hir};
 use rustc_index::IndexVec;
 use rustc_macros::{
     extension, Decodable, Encodable, HashStable, TyDecodable, TyEncodable, TypeFoldable,
@@ -1689,9 +1689,9 @@ impl<'tcx> TyCtxt<'tcx> {
             | (ImplPolarity::Negative, ImplPolarity::Negative) => {}
         };
 
-        let is_marker_impl = |trait_ref: TraitRef<'_>| self.trait_def(trait_ref.def_id).is_marker;
-        let is_marker_overlap = is_marker_impl(trait_ref1) && is_marker_impl(trait_ref2);
-
+        let is_marker_overlap = [trait_ref1, trait_ref2]
+            .into_iter()
+            .all(|trait_ref| self.trait_def(trait_ref.def_id).marker.is_some());
         if is_marker_overlap {
             return Some(ImplOverlapKind::Permitted { marker: true });
         }

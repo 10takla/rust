@@ -2059,6 +2059,7 @@ symbols! {
         while_let,
         windows,
         windows_subsystem,
+        with_items,
         with_negative_coherence,
         wrapping_add,
         wrapping_div,

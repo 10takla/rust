@@ -173,6 +173,7 @@ macro_rules! template {
     (OneOf: $one_of: expr) => { template!(@ false, None, $one_of, None) };
     (NameValueStr: $descr: expr) => { template!(@ false, None, &[], Some($descr)) };
     (Word, List: $descr: expr) => { template!(@ true, Some($descr), &[], None) };
+    (Word, OneOf: $one_of: expr) => { template!(@ true, None, $one_of, None) };
     (Word, NameValueStr: $descr: expr) => { template!(@ true, None, &[], Some($descr)) };
     (List: $descr1: expr, NameValueStr: $descr2: expr) => {
         template!(@ false, Some($descr1), &[], Some($descr2))
@@ -520,7 +521,7 @@ pub const BUILTIN_ATTRIBUTES: &[BuiltinAttribute] = &[
     ),
     // RFC #1268
     gated!(
-        marker, Normal, template!(Word), WarnFollowing, EncodeCrossCrate::No,
+        marker, Normal, template!(Word, OneOf: &[sym::with_items]), WarnFollowing, EncodeCrossCrate::No,
         marker_trait_attr, experimental!(marker)
     ),
     gated!(

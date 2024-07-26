@@ -3297,6 +3297,16 @@ impl fmt::Display for Constness {
     }
 }
 
+/// A markered trait mode that determines whether the trait is
+/// allowed to ignore overlapping impls with associative elements
+#[derive(HashStable_Generic, Encodable, Decodable, Clone, Copy)]
+pub enum MarkerMode {
+    /// Ignore overlap
+    WithoutItems,
+    /// Allow overlap
+    WithItems,
+}
+
 #[derive(Copy, Clone, Debug, HashStable_Generic)]
 pub struct FnHeader {
     pub safety: Safety,

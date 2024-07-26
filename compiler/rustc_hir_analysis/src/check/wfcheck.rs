@@ -1171,7 +1171,9 @@ fn check_trait(tcx: TyCtxt<'_>, item: &hir::Item<'_>) -> Result<(), ErrorGuarant
 
     let def_id = item.owner_id.def_id;
     let trait_def = tcx.trait_def(def_id);
-    if trait_def.is_marker
+
+    // Cause an error if `#[marker]` trait contains associative elements
+    if matches!(trait_def.marker, Some(hir::MarkerMode::WithoutItems))
         || matches!(trait_def.specialization_kind, TraitSpecializationKind::Marker)
     {
         for associated_def_id in &*tcx.associated_item_def_ids(def_id) {

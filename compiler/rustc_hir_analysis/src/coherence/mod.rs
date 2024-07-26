@@ -8,7 +8,7 @@
 use crate::errors;
 use rustc_errors::{codes::*, struct_span_code_err};
 use rustc_hir::def_id::{DefId, LocalDefId};
-use rustc_hir::LangItem;
+use rustc_hir::{LangItem, MarkerMode};
 use rustc_middle::query::Providers;
 use rustc_middle::ty::{self, TyCtxt, TypeVisitableExt};
 use rustc_session::parse::feature_err;
@@ -104,7 +104,8 @@ fn enforce_empty_impls_for_marker_traits(
     trait_def_id: DefId,
     trait_def: &ty::TraitDef,
 ) -> Result<(), ErrorGuaranteed> {
-    if !trait_def.is_marker {
+    // Do not enforce if the trait is not marker, or the marker is in `WithItems` mode
+    if matches!(trait_def.marker, Some(MarkerMode::WithItems) | None) {
         return Ok(());
     }
 

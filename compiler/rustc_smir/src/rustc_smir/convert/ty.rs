@@ -541,7 +541,7 @@ impl<'tcx> Stable<'tcx> for ty::TraitDef {
             safety: self.safety.stable(tables),
             paren_sugar: self.paren_sugar,
             has_auto_impl: self.has_auto_impl,
-            is_marker: self.is_marker,
+            is_marker: self.marker.is_some(),
             is_coinductive: self.is_coinductive,
             skip_array_during_method_dispatch: self.skip_array_during_method_dispatch,
             skip_boxed_slice_during_method_dispatch: self.skip_boxed_slice_during_method_dispatch,

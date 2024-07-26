@@ -14,7 +14,7 @@
 //! At present, however, we do run collection across all items in the
 //! crate as a kind of pass. This should eventually be factored away.
 
-use rustc_ast::Recovered;
+use rustc_ast::{MetaItemKind, Recovered};
 use rustc_data_structures::captures::Captures;
 use rustc_data_structures::fx::{FxHashSet, FxIndexMap};
 use rustc_data_structures::unord::UnordMap;
@@ -1222,7 +1222,19 @@ fn trait_def(tcx: TyCtxt<'_>, def_id: LocalDefId) -> ty::TraitDef {
         tcx.dcx().emit_err(errors::ParenSugarAttribute { span: item.span });
     }
 
-    let is_marker = tcx.has_attr(def_id, sym::marker);
+    let marker = tcx.get_attr(def_id, sym::marker).map(|attr| {
+        // Whether the attribute is `#[marker]` or `#[marker(with_items)]` (and nothing else)
+        // is guaranteed at the `rustc_feature` level. The distinction is determined
+        // by whether `MetaItemKind`: `List` = `#[marker(with_items)]`, `Word` = `#[marker]`.
+        match attr.meta_kind().unwrap() {
+            MetaItemKind::List(_) => hir::MarkerMode::WithItems,
+            MetaItemKind::Word => hir::MarkerMode::WithoutItems,
+            _ => {
+                unreachable!()
+            }
+        }
+    });
+
     let rustc_coinductive = tcx.has_attr(def_id, sym::rustc_coinductive);
     let is_fundamental = tcx.has_attr(def_id, sym::fundamental);
 
@@ -1375,7 +1387,7 @@ fn trait_def(tcx: TyCtxt<'_>, def_id: LocalDefId) -> ty::TraitDef {
         constness,
         paren_sugar,
         has_auto_impl: is_auto,
-        is_marker,
+        marker,
         is_coinductive: rustc_coinductive || is_auto,
         is_fundamental,
         skip_array_during_method_dispatch,

@@ -29,10 +29,13 @@ pub struct TraitDef {
 
     pub has_auto_impl: bool,
 
-    /// If `true`, then this trait has the `#[marker]` attribute, indicating
-    /// that all its associated items have defaults that cannot be overridden,
-    /// and thus `impl`s of it are allowed to overlap.
-    pub is_marker: bool,
+    /// If `Some(MarkerMode)`, this feature has a `#[marker]`/`#[marker(with_items)]`
+    /// attribute indicating that the `impl` of this feature is
+    /// allowed to overlap if:
+    ///     `MarkerMode::WithItems` - allowed always,
+    ///     `MarkerMode::WithItems` - only if all associated items have default
+    ///     that cannot be overridden
+    pub marker: Option<hir::MarkerMode>,
 
     /// If `true`, then this trait has the `#[rustc_coinductive]` attribute or
     /// is an auto trait. This indicates that trait solver cycles involving an
